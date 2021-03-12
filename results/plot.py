@@ -24,14 +24,7 @@ FIGSIZE_INCHES = (16, 9)
 
 # CSV files that should be preset in the input directory.
 EXPECTED_CSV_FILES=[
-    "Device_Maxed.csv",
-    "Large_Pops.csv",
-    "Large_Pops_Brute_Force.csv",
-    "Small_Fixed_Pop.csv",
-    "Small_Fixed_Pop_Brute_Force.csv",
-    "Small_Pops.csv",
-    "Small_Pops_Brute_Force.csv",
-    "Large_Pops_Falloff_Brute_Force.csv"
+    "very_large_pop_brute_force.csv"
 ]
 
 
@@ -40,23 +33,23 @@ EXPECTED_CSV_FILES=[
 # GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,step,ms_step
 
 # Input cols for per sim.
-# GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,mean_message_count,ms_rtc,ms_simulation,ms_init,ms_exit,ms_step_mean
+# GPU,release_mode,seatbelts_on,model,steps,agent_count,env_width,comm_radius,repeat,agent_density,mean_message_count,ms_rtc,ms_simulation,ms_init,ms_exit,ms_sim_mean
 
 # input csv columns which identify a row as a duplicate of another repetition for aggregation, for per-step per-sim csvs
-GROUP_BY_COLUMNS_PER_STEP_PER_SIM = ['is_concurrent', 'pop_size', 'num_species']
+GROUP_BY_COLUMNS_PER_STEP_PER_SIM = ['pop_size', 'ensemble_size']
 
 # input csv columns which identify a row as a duplicate of another repetition for aggregation, for per-sim csv
-GROUP_BY_COLUMNS_PER_SIM = ['is_concurrent', 'pop_size', 'num_species']
+GROUP_BY_COLUMNS_PER_SIM = ['pop_size', 'ensemble_size']
 
 
 # Aggregate operations to apply across grouped csv rows, for the per-step per-sim csvs
 AGGREGATIONS_PER_STEP_PER_SIM = {
-    'ms_step_mean' : ['mean']
+    'ms_sim_mean' : ['mean']
 }
 
 # Aggregate operations to apply across grouped csv rows, for the per-sim csvs
 AGGREGATIONS_PER_SIM = {
-    'ms_step_mean' : ['mean']
+    'ms_sim_mean' : ['mean']
 }
 
 
@@ -205,15 +198,6 @@ def process_data(input_dataframes, verbose):
         # Store teh processed dataframe.
         output_dataframes[csv_name] = grouped_df
 
-        # Generate speedup data
-        serialdf = grouped_df[(grouped_df.is_concurrent == 0)]
-        concurrentdf = grouped_df[(grouped_df.is_concurrent == 1)]
-        concurrentdf.index = range(len(concurrentdf.index))
-
-        speedupdf = serialdf
-        speedupdf['speedup'] = serialdf['mean_ms_step_mean'] / concurrentdf['mean_ms_step_mean']
-        output_dataframes['speedup_' + csv_name] = speedupdf
-
     return output_dataframes
 
 def store_processed_data(input_dataframes, processed_dataframes, output_dir, force, verbose):
@@ -267,13 +251,13 @@ MANUAL_PRETTY_CSV_KEY_MAP = {
     "ms_simulation": "Simulation Time (ms)",
     "ms_init": "Init Function Time (ms)",
     "ms_exit": "Exit Function Time (ms)",
-    "ms_step_mean": "Average Step Time (ms)",
+    "ms_sim_mean": "Average Simulation Time (ms)",
     "ms_step": "Step Time (ms)",
     "mean_ms_rtc": "Average RTC Time (ms)",
     "mean_ms_simulation": "Average Simulation Time (ms)",
     "mean_ms_init": "Average Init Function Time (ms)",
     "mean_ms_exit": "Average Exit Function Time (ms)",
-    "mean_ms_step_mean": "Average Step Time (ms)",
+    "mean_ms_sim_mean": "Average Step Time (ms)",
     "mean_ms_step": "Average Step Time (ms)",
     "mean_agent_density": "Agent Density",
     "env_volume": "Environment Volume",
@@ -493,207 +477,12 @@ SEQUENTIAL_PALETTE = "viridis"
 # Define the figures to generate for each input CSV.
 PLOTS_PER_CSV={
     # No need for sequential colour pallete 
-    "Device_Maxed.csv": [
+    "very_large_pop_brute_force.csv": [
         PlotOptions(
-            filename="device_maxed.png",
+            filename="very_large_pop_brute_force.png",
             plot_type="lineplot",
-            xkey="num_species",
-            ykey="mean_ms_step_mean",
-            huekey="pop_size",
-            stylekey="is_concurrent",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "Large_Pops.csv": [
-        PlotOptions(
-            filename="large_pops.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="mean_ms_step_mean",
-            huekey="pop_size",
-            stylekey="is_concurrent",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "Large_Pops_Brute_Force.csv": [
-        PlotOptions(
-            filename="large_pops_brute_force.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="mean_ms_step_mean",
-            huekey="pop_size",
-            stylekey="is_concurrent",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "Small_Fixed_Pop.csv": [
-        PlotOptions(
-            filename="small_fixed_pop.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="mean_ms_step_mean",
-            huekey="pop_size",
-            stylekey="is_concurrent",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "Small_Fixed_Pop_Brute_Force.csv": [
-        PlotOptions(
-            filename="small_fixed_pop_brute_force.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="mean_ms_step_mean",
-            huekey="pop_size",
-            stylekey="is_concurrent",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "Small_Pops.csv": [
-        PlotOptions(
-            filename="small_pops.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="mean_ms_step_mean",
-            huekey="pop_size",
-            stylekey="is_concurrent",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "Small_Pops_Brute_Force.csv": [
-        PlotOptions(
-            filename="small_Pops_brute_force.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="mean_ms_step_mean",
-            huekey="pop_size",
-            stylekey="is_concurrent",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "Large_Pops_Falloff_Brute_Force.csv": [
-        PlotOptions(
-            filename="large_pops_falloff_brute_force.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="mean_ms_step_mean",
-            huekey="pop_size",
-            stylekey="is_concurrent",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "speedup_Device_Maxed.csv": [
-        PlotOptions(
-            filename="device_maxed.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="speedup",
-            huekey="pop_size",
-            stylekey="pop_size",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "speedup_Large_Pops.csv": [
-        PlotOptions(
-            filename="large_pops.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="speedup",
-            huekey="pop_size",
-            stylekey="pop_size",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "speedup_Large_Pops_Brute_Force.csv": [
-        PlotOptions(
-            filename="large_pops_brute_force.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="speedup",
-            huekey="pop_size",
-            stylekey="pop_size",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "speedup_Small_Fixed_Pop.csv": [
-        PlotOptions(
-            filename="small_fixed_pop.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="speedup",
-            huekey="pop_size",
-            stylekey="pop_size",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "speedup_Small_Fixed_Pop_Brute_Force.csv": [
-        PlotOptions(
-            filename="small_fixed_pop_brute_force.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="speedup",
-            huekey="pop_size",
-            stylekey="pop_size",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "speedup_Small_Pops.csv": [
-        PlotOptions(
-            filename="small_pops.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="speedup",
-            huekey="pop_size",
-            stylekey="pop_size",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "speedup_Small_Pops_Brute_Force.csv": [
-        PlotOptions(
-            filename="small_Pops_brute_force.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="speedup",
-            huekey="pop_size",
-            stylekey="pop_size",
-            sns_palette=SEQUENTIAL_PALETTE,
-            minx=0,
-            miny=0
-        )
-    ],
-    "speedup_Large_Pops_Falloff_Brute_Force.csv": [
-        PlotOptions(
-            filename="large_pops_falloff_brute_force.png",
-            plot_type="lineplot",
-            xkey="num_species",
-            ykey="speedup",
+            xkey="ensemble_size",
+            ykey="mean_ms_sim_mean",
             huekey="pop_size",
             stylekey="pop_size",
             sns_palette=SEQUENTIAL_PALETTE,
