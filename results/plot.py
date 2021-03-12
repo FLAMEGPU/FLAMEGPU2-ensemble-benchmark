@@ -24,7 +24,10 @@ FIGSIZE_INCHES = (16, 9)
 
 # CSV files that should be preset in the input directory.
 EXPECTED_CSV_FILES=[
-    "very_large_pop_brute_force.csv"
+    "small_pop_brute_force.csv",
+    "large_pop_brute_force.csv",
+    "small_pop.csv",
+    "large_pop.csv"
 ]
 
 
@@ -257,7 +260,7 @@ MANUAL_PRETTY_CSV_KEY_MAP = {
     "mean_ms_simulation": "Average Simulation Time (ms)",
     "mean_ms_init": "Average Init Function Time (ms)",
     "mean_ms_exit": "Average Exit Function Time (ms)",
-    "mean_ms_sim_mean": "Average Step Time (ms)",
+    "mean_ms_sim_mean": "Average Simulation Time (ms)",
     "mean_ms_step": "Average Step Time (ms)",
     "mean_agent_density": "Agent Density",
     "env_volume": "Environment Volume",
@@ -477,9 +480,48 @@ SEQUENTIAL_PALETTE = "viridis"
 # Define the figures to generate for each input CSV.
 PLOTS_PER_CSV={
     # No need for sequential colour pallete 
-    "very_large_pop_brute_force.csv": [
+    "small_pop_brute_force.csv": [
         PlotOptions(
-            filename="very_large_pop_brute_force.png",
+            filename="small_pop_brute_force.png",
+            plot_type="lineplot",
+            xkey="ensemble_size",
+            ykey="mean_ms_sim_mean",
+            huekey="pop_size",
+            stylekey="pop_size",
+            sns_palette=SEQUENTIAL_PALETTE,
+            minx=0,
+            miny=0
+        )
+    ],
+    "large_pop_brute_force.csv": [
+        PlotOptions(
+            filename="large_pop_brute_force.png",
+            plot_type="lineplot",
+            xkey="ensemble_size",
+            ykey="mean_ms_sim_mean",
+            huekey="pop_size",
+            stylekey="pop_size",
+            sns_palette=SEQUENTIAL_PALETTE,
+            minx=0,
+            miny=0
+        )
+    ],
+    "small_pop.csv": [
+        PlotOptions(
+            filename="small_pop.png",
+            plot_type="lineplot",
+            xkey="ensemble_size",
+            ykey="mean_ms_sim_mean",
+            huekey="pop_size",
+            stylekey="pop_size",
+            sns_palette=SEQUENTIAL_PALETTE,
+            minx=0,
+            miny=0
+        )
+    ],
+    "large_pop.csv": [
+        PlotOptions(
+            filename="large_pop.png",
             plot_type="lineplot",
             xkey="ensemble_size",
             ykey="mean_ms_sim_mean",
