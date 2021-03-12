@@ -610,8 +610,10 @@ int main(int argc, const char ** argv) {
 
     for (auto experiment : experiments) {
 
-    std::vector<double> serialResults;
-    std::vector<double> concurrentResults;
+    // Pandas
+    std::string csvFileName = "../results/" + experiment.title + ".csv";
+    std::ofstream csv(csvFileName, std::ios::app);
+    csv << "repetition, pop_size, ensemble_size, ms_sim_mean" << std::endl;
     
     for (unsigned int popSize = experiment.initialPopSize; popSize <= experiment.finalPopSize; popSize += experiment.popSizeIncrement) {
         for (unsigned int ensembleSize : experiment.ensembleSizes) {
@@ -737,7 +739,7 @@ int main(int argc, const char ** argv) {
             const auto runTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
             
             std::cout << "Run complete. Total run time: " << runTime << "ms" << std::endl;
-            serialResults.push_back(runTime);
+            csv << "0," << popSize << "," << ensembleSize << "," << runTime << std::endl;
 
 #ifdef VISUALISATION
             visualisation.join();
