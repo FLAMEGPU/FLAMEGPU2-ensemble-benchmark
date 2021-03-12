@@ -600,13 +600,14 @@ typedef struct Experiment {
 int main(int argc, const char ** argv) {
 
     Experiment smallPopBruteForce("small_pop_brute_force", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, false);
-    Experiment largePopBruteForce("large_pop_brute_force", 2048, 8192, 2000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, false);
+    Experiment largePopBruteForce("large_pop_brute_force", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, false);
     //Experiment veryLargePopBruteForce("very_large_pop_brute_force", 5000, 5000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, false);
     
-    Experiment smallPop("small_pop_brute_force", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, true);
-    Experiment largePop("large_pop_brute_force", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, true);
+    Experiment smallPop("small_pop", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, true);
+    Experiment largePop("large_pop", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, true);
     //Experiment veryLargePop("very_large_pop_brute_force", 5000, 20000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, true);
     std::vector<Experiment> experiments = {smallPopBruteForce, largePopBruteForce, smallPop, largePop};
+    //std::vector<Experiment> experiments = {smallPop, largePop};
 
     for (auto experiment : experiments) {
 
