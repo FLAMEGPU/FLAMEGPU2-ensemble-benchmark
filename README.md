@@ -7,25 +7,25 @@ This repository contains the figures relating to ensembles shown in the talk *Si
 ![Figure 2.1](./results/figures/small--small_pop_brute_force.png)
 *__Small populations brute force__ This figure shows how the average simulation time scales with ensemble size for different population sizes of a brute force messaging boids model.*
 
-Generated using an `NVIDIA V100` GPU.
+Generated using an `NVIDIA Titan V` GPU.
 
 ## Small Populations (Spatial)
 ![Figure 2.1](./results/figures/small--small_pop.png)
 *__Small populations spatial__ This figure shows how the average simulation time scales with ensemble size for different population sizes of a spatial messaging boids model.*
 
-Generated using an `NVIDIA V100` GPU.
+Generated using an `NVIDIA Titan V` GPU.
 
 ## Large Populations (Brute force)
 ![Figure 2.1](./results/figures/large--large_pop_brute_force.png)
 *__Large populations brute force__ This figure shows how the average simulation time scales with ensemble size for different large population sizes of a brute force messaging boids model.*
 
-Generated using an `NVIDIA V100` GPU.
+Generated using an `NVIDIA Titan V` GPU.
 
 ## Large Populations (Spatial)
 ![Figure 2.1](./results/figures/large--large_pop.png)
 *__Large populations spatial__ This figure shows how the average simulation time scales with ensemble size for different large population sizes of a spatial messaging boids model.*
 
-Generated using an `NVIDIA V100` GPU.
+Generated using an `NVIDIA Titan V` GPU.
 
 # Building the Experiments
 
