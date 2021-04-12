@@ -1,29 +1,29 @@
 # FLAMEGPU2 Ensemble Experiments
-This repository contains the Figures XYZ shown in the paper/talk [Link to talk/paper](), along with the code to generate them. The code demonstrates the effect and scaling of the concurrency feature of the FLAMEGPU2 agent-based modelling framework. Please note that generated figures may differ slightly as a result of the stochastic nature of the simulations and hardware differences.
+This repository contains the figures relating to ensembles shown in the talk *Simulate the World and Everything in It: Complex Systems Simulations with FGPU2* given by Paul Richmond at [GTC 2021](https://www.nvidia.com/en-us/gtc/topics/developer-tools/), along with the code to generate them. The code demonstrates the effect and scaling of the concurrency feature of the FLAMEGPU2 agent-based modelling framework. Please note that generated figures may differ slightly as a result of the stochastic nature of the simulations and hardware differences.
 
 # Figures
 
 ## Small Populations (Brute force)
 ![Figure 2.1](./results/figures/small--small_pop_brute_force.png)
-*__Figure__ This figure shows ...*
+*__Small populations brute force__ This figure shows how the average simulation time scales with ensemble size for different population sizes of a brute force messaging boids model.*
 
 Generated using an `NVIDIA V100` GPU.
 
 ## Small Populations (Spatial)
 ![Figure 2.1](./results/figures/small--small_pop.png)
-*__Figure__ This figure shows ...*
+*__Small populations spatial__ This figure shows how the average simulation time scales with ensemble size for different population sizes of a spatial messaging boids model.*
 
 Generated using an `NVIDIA V100` GPU.
 
 ## Large Populations (Brute force)
 ![Figure 2.1](./results/figures/large--large_pop_brute_force.png)
-*__Figure__ This figure shows ...*
+*__Large populations brute force__ This figure shows how the average simulation time scales with ensemble size for different large population sizes of a brute force messaging boids model.*
 
 Generated using an `NVIDIA V100` GPU.
 
 ## Large Populations (Spatial)
 ![Figure 2.1](./results/figures/large--large_pop.png)
-*__Figure__ This figure shows ...*
+*__Large populations spatial__ This figure shows how the average simulation time scales with ensemble size for different large population sizes of a spatial messaging boids model.*
 
 Generated using an `NVIDIA V100` GPU.
 
