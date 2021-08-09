@@ -1,24 +1,14 @@
-# Set the minimum cmake version to that which supports cuda natively.
-# 3.10 required for cuda -std=c++14, however 3.12 fixes some device linker errors
-cmake_minimum_required(VERSION VERSION 3.12 FATAL_ERROR)
+# Set the minimum cmake version requires by this project.
+cmake_minimum_required(VERSION VERSION 3.15 FATAL_ERROR)
 
 # Name the project and set languages
-project(flamegpu2_example CUDA CXX)
+project(ensemble_benchmark CUDA CXX)
+
+# Use a branch name such as `master`, or a tagged version such as `v2.0.0-alpha` 
+set(FLAMEGPU_VERSION "master" CACHE STRING "Git branch or tag to use")
 
 # Our core dependency is FLAMEGPU2 lib, first lets find it
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/flamegpu2.cmake)
-# Now disable extra bells/whistles and add it as s dependency
-set(BUILD_ALL_EXAMPLES OFF CACHE BOOL "-")
-set(BUILD_TESTS OFF CACHE BOOL "-")
-add_subdirectory(${FLAMEGPU_ROOT})
-mark_as_advanced(FORCE BUILD_FLAMEGPU2)
-mark_as_advanced(FORCE BUILD_ALL_EXAMPLES)
-mark_as_advanced(FORCE BUILD_EXAMPLE_HOST_FUNCTIONS)
-mark_as_advanced(FORCE BUILD_EXAMPLE_GAME_OF_LIFE)
-mark_as_advanced(FORCE BUILD_EXAMPLE_CIRCLES_BRUTE_FORCE)
-mark_as_advanced(FORCE BUILD_EXAMPLE_CIRCLES_SPATIAL_3D)
-mark_as_advanced(FORCE BUILD_EXAMPLE_RTC_EXAMPLE)
-mark_as_advanced(FORCE BUILD_TESTS)
 
 # Include common rules.
 include(${FLAMEGPU_ROOT}/cmake/common.cmake)
