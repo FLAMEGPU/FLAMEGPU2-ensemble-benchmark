@@ -1,11 +1,11 @@
-# Set the minimum cmake version requires by this project.
-cmake_minimum_required(VERSION VERSION 3.15 FATAL_ERROR)
+cmake_minimum_required(VERSION VERSION 3.18 FATAL_ERROR)
 
 # Name the project and set languages
 project(ensemble_benchmark CUDA CXX)
 
+# Optionaly set the version of flamegpu which should be used.
 # Use a branch name such as `master`, or a tagged version such as `v2.0.0-alpha` 
-set(FLAMEGPU_VERSION "master" CACHE STRING "Git branch or tag to use")
+set(FLAMEGPU_VERSION "v2.0.0-alpha.1" CACHE STRING "Git branch or tag to use")
 
 # Our core dependency is FLAMEGPU2 lib, first lets find it
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/flamegpu2.cmake)
