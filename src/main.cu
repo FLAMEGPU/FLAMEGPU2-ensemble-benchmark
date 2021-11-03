@@ -615,7 +615,7 @@ int main(int argc, const char ** argv) {
     // Pandas
     std::string csvFileName = "../results/" + experiment.title + ".csv";
     std::ofstream csv(csvFileName, std::ios::app);
-    csv << "repetition, pop_size, ensemble_size, ms_sim_mean" << std::endl;
+    csv << "repetition,pop_size,ensemble_size,ms_sim_mean" << std::endl;
     
     for (unsigned int popSize = experiment.initialPopSize; popSize <= experiment.finalPopSize; popSize += experiment.popSizeIncrement) {
         for (unsigned int ensembleSize : experiment.ensembleSizes) {
