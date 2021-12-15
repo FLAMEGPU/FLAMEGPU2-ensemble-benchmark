@@ -113,7 +113,7 @@ FLAMEGPU_HOST_DEVICE_FUNCTION void clampPosition(float &x, float &y, float &z, c
 
 FLAMEGPU_INIT_FUNCTION(Init) {
     auto env = FLAMEGPU->environment;
-    std::mt19937 rngEngine(1234);
+    std::mt19937_64 rngEngine(FLAMEGPU->random.getSeed());
     std::uniform_real_distribution<float> position_distribution(env.getProperty<float>("MIN_POSITION"), env.getProperty<float>("MAX_POSITION"));
     std::uniform_real_distribution<float> velocity_distribution(-1, 1);
     std::uniform_real_distribution<float> velocity_magnitude_distribution(env.getProperty<float>("MIN_INITIAL_SPEED"), env.getProperty<float>("MAX_INITIAL_SPEED"));
@@ -784,6 +784,8 @@ int main(int argc, const char ** argv) {
                             if (repetition < 0) {
                                 runs.setSteps(1);
                             }
+                            // Set the seeds for the run plan vector. Use the current repetition as the seed for all simulations in the ensemble.
+                            runs.setRandomSimulationSeed(repetition, 0);
                         }
                         
                         flamegpu::CUDAEnsemble cuda_ensemble(model, argc, argv);              
