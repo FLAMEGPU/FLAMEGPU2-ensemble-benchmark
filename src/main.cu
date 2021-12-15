@@ -653,7 +653,7 @@ int main(int argc, const char ** argv) {
     for (auto experiment : experiments) {
 
     // Pandas
-    std::string csvFileName = "../results/" + experiment.title + ".csv";
+    std::string csvFileName = experiment.title + ".csv";
     std::ofstream csv(csvFileName, std::ios::app);
     csv << "repetition,pop_size,ensemble_size,s_sim_mean" << std::endl;
     
