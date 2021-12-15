@@ -619,6 +619,7 @@ typedef struct Experiment {
         unsigned int initialPopSize, unsigned int finalPopSize, unsigned int popSizeIncrement,
 	unsigned int totalRuns,
 	std::vector<unsigned int> ensembleSizes,
+    int repetitions,
 	unsigned int steps,
 	bool spatial) {
             this->title = title;
@@ -627,168 +628,186 @@ typedef struct Experiment {
 	    this->popSizeIncrement = popSizeIncrement;
 	    this->totalRuns = totalRuns;
 	    this->ensembleSizes = ensembleSizes;
+        this->repetitions = repetitions;
 	    this->steps = steps;
-	    this->spatial = spatial;	
+	    this->spatial = spatial;
 	}
 	std::string title;
 	unsigned int initialPopSize, finalPopSize, popSizeIncrement;
 	unsigned int totalRuns;
 	std::vector<unsigned int> ensembleSizes;
+    int repetitions;
 	unsigned int steps;
 	bool spatial;
 } Experiment;
 
 int main(int argc, const char ** argv) {
-
-    Experiment smallPopBruteForce("small_pop_brute_force", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, false);
-    Experiment largePopBruteForce("large_pop_brute_force", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, false);
-    //Experiment veryLargePopBruteForce("very_large_pop_brute_force", 5000, 5000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, false);
     
-    Experiment smallPop("small_pop", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, true);
-    Experiment largePop("large_pop", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, true);
-    //Experiment veryLargePop("very_large_pop_brute_force", 5000, 20000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, 500, true);
+    const int repetitions = 3;
+
+    Experiment smallPopBruteForce("small_pop_brute_force", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, false);
+    Experiment largePopBruteForce("large_pop_brute_force", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, false);
+    Experiment veryLargePopBruteForce("very_large_pop_brute_force", 5000, 5000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, false);
+    
+    Experiment smallPop("small_pop", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
+    Experiment largePop("large_pop", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
+    Experiment veryLargePop("very_large_pop_brute_force", 5000, 20000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
+   
     std::vector<Experiment> experiments = {smallPopBruteForce, largePopBruteForce, smallPop, largePop};
     //std::vector<Experiment> experiments = {smallPop, largePop};
 
     for (auto experiment : experiments) {
 
-    // Pandas
-    std::string csvFileName = experiment.title + ".csv";
-    std::ofstream csv(csvFileName);
-    csv << "repetition,pop_size,ensemble_size,s_sim_mean" << std::endl;
-    
-    for (unsigned int popSize = experiment.initialPopSize; popSize <= experiment.finalPopSize; popSize += experiment.popSizeIncrement) {
-        for (unsigned int ensembleSize : experiment.ensembleSizes) {
-            std::cout << "Staring run with popSize: " << popSize << ", species: " << ensembleSize << std::endl;
-            flamegpu::ModelDescription model("Boids_Ensemble");
+        // Pandas
+        std::string csvFileName = experiment.title + ".csv";
+        std::ofstream csv(csvFileName);
+        csv << "repetition,pop_size,ensemble_size,s_sim_mean" << std::endl;
+   
+        for (int repetition = -1; repetition < experiment.repetitions; repetition++) {
+            std::cout << "Beginning repetiton " << repetition;
+            for (unsigned int popSize = experiment.initialPopSize; popSize <= experiment.finalPopSize; popSize += experiment.popSizeIncrement) {
+                for (unsigned int ensembleSize : experiment.ensembleSizes) {
+                    std::cout << "Staring run with popSize: " << popSize << ", species: " << ensembleSize << std::endl;
+                    flamegpu::ModelDescription model("Boids_Ensemble");
 
-            /**
-            * GLOBALS
-            */
-            flamegpu::EnvironmentDescription &env = model.Environment();
-            {
-                // Population size to generate, if no agents are loaded from disk
-                env.newProperty("POPULATION_TO_GENERATE", popSize);
+                    /**
+                    * GLOBALS
+                    */
+                    flamegpu::EnvironmentDescription &env = model.Environment();
+                    {
+                        // Population size to generate, if no agents are loaded from disk
+                        env.newProperty("POPULATION_TO_GENERATE", popSize);
 
-                // Environment Bounds
-                env.newProperty("MIN_POSITION", -0.5f);
-                env.newProperty("MAX_POSITION", +0.5f);
+                        // Environment Bounds
+                        env.newProperty("MIN_POSITION", -0.5f);
+                        env.newProperty("MAX_POSITION", +0.5f);
 
-                // Initialisation parameter(s)
-                env.newProperty("MAX_INITIAL_SPEED", 1.0f);
-                env.newProperty("MIN_INITIAL_SPEED", 0.01f);
+                        // Initialisation parameter(s)
+                        env.newProperty("MAX_INITIAL_SPEED", 1.0f);
+                        env.newProperty("MIN_INITIAL_SPEED", 0.01f);
 
-                // Interaction radius
-                env.newProperty("INTERACTION_RADIUS", 0.1f);
-                env.newProperty("SEPARATION_RADIUS", 0.005f);
+                        // Interaction radius
+                        env.newProperty("INTERACTION_RADIUS", 0.1f);
+                        env.newProperty("SEPARATION_RADIUS", 0.005f);
 
-                // Global Scalers
-                env.newProperty("TIME_SCALE", 0.0005f);
-                env.newProperty("GLOBAL_SCALE", 0.15f);
+                        // Global Scalers
+                        env.newProperty("TIME_SCALE", 0.0005f);
+                        env.newProperty("GLOBAL_SCALE", 0.15f);
 
-                // Rule scalers
-                env.newProperty("STEER_SCALE", 0.65f);
-                env.newProperty("COLLISION_SCALE", 0.75f);
-                env.newProperty("MATCH_SCALE", 1.25f);
-            }
+                        // Rule scalers
+                        env.newProperty("STEER_SCALE", 0.65f);
+                        env.newProperty("COLLISION_SCALE", 0.75f);
+                        env.newProperty("MATCH_SCALE", 1.25f);
+                    }
 
-            {   // Location message      
-                std::string messageName = "location";
-		if (experiment.spatial) {
-                flamegpu::MessageSpatial3D::Description &message = model.newMessage<flamegpu::MessageSpatial3D>(messageName);
-                // Set the range and bounds.
-                message.setRadius(env.getProperty<float>("INTERACTION_RADIUS"));
-                message.setMin(env.getProperty<float>("MIN_POSITION"), env.getProperty<float>("MIN_POSITION"), env.getProperty<float>("MIN_POSITION"));
-                message.setMax(env.getProperty<float>("MAX_POSITION"), env.getProperty<float>("MAX_POSITION"), env.getProperty<float>("MAX_POSITION"));
-                // A message to hold the location of an agent.
-                message.newVariable<int>("id");
-                // X Y Z are implicit.
-                // message.newVariable<float>("x");
-                // message.newVariable<float>("y");
-                // message.newVariable<float>("z");
-                message.newVariable<float>("fx");
-                message.newVariable<float>("fy");
-                message.newVariable<float>("fz");
-                } else {
-		flamegpu::MessageBruteForce::Description &message = model.newMessage<flamegpu::MessageBruteForce>(messageName);
-                // A message to hold the location of an agent.
-                message.newVariable<int>("id");
-                message.newVariable<float>("x");
-                message.newVariable<float>("y");
-                message.newVariable<float>("z");
-                message.newVariable<float>("fx");
-                message.newVariable<float>("fy");
-                message.newVariable<float>("fz");
-		}
-            }
-            {   // Boid agent
-                std::string agentName("Boid");
-                flamegpu::AgentDescription &agent = model.newAgent(agentName);
-                agent.newVariable<int>("id");
-                agent.newVariable<float>("x");
-                agent.newVariable<float>("y");
-                agent.newVariable<float>("z");
-                agent.newVariable<float>("fx");
-                agent.newVariable<float>("fy");
-                agent.newVariable<float>("fz");
-                std::string messageName = "location";
-                std::string outputFuncName = "outputdata";
-                std::string inputFuncName = "inputdata";
-		if (experiment.spatial) {
-                    agent.newRTCFunction(agentName + outputFuncName, outputdata).setMessageOutput(messageName);
-                    agent.newRTCFunction(agentName + inputFuncName, inputdata).setMessageInput(messageName);
-		} else {
-                    agent.newRTCFunction(agentName + outputFuncName, outputdataBruteForce).setMessageOutput(messageName);
-                    agent.newRTCFunction(agentName + inputFuncName, inputdataBruteForce).setMessageInput(messageName);
-		}
-	
-            }
+                    {   // Location message      
+                        std::string messageName = "location";
+	        	        if (experiment.spatial) {
+                            flamegpu::MessageSpatial3D::Description &message = model.newMessage<flamegpu::MessageSpatial3D>(messageName);
+                            // Set the range and bounds.
+                            message.setRadius(env.getProperty<float>("INTERACTION_RADIUS"));
+                            message.setMin(env.getProperty<float>("MIN_POSITION"), env.getProperty<float>("MIN_POSITION"), env.getProperty<float>("MIN_POSITION"));
+                            message.setMax(env.getProperty<float>("MAX_POSITION"), env.getProperty<float>("MAX_POSITION"), env.getProperty<float>("MAX_POSITION"));
+                            // A message to hold the location of an agent.
+                            message.newVariable<int>("id");
+                            // X Y Z are implicit.
+                            // message.newVariable<float>("x");
+                            // message.newVariable<float>("y");
+                            // message.newVariable<float>("z");
+                            message.newVariable<float>("fx");
+                            message.newVariable<float>("fy");
+                            message.newVariable<float>("fz");
+                        } else {
+	        	            flamegpu::MessageBruteForce::Description &message = model.newMessage<flamegpu::MessageBruteForce>(messageName);
+                            // A message to hold the location of an agent.
+                            message.newVariable<int>("id");
+                            message.newVariable<float>("x");
+                            message.newVariable<float>("y");
+                            message.newVariable<float>("z");
+                            message.newVariable<float>("fx");
+                            message.newVariable<float>("fy");
+                            message.newVariable<float>("fz");
+	        	        }
+                    }
+                    {   // Boid agent
+                        std::string agentName("Boid");
+                        flamegpu::AgentDescription &agent = model.newAgent(agentName);
+                        agent.newVariable<int>("id");
+                        agent.newVariable<float>("x");
+                        agent.newVariable<float>("y");
+                        agent.newVariable<float>("z");
+                        agent.newVariable<float>("fx");
+                        agent.newVariable<float>("fy");
+                        agent.newVariable<float>("fz");
+                        std::string messageName = "location";
+                        std::string outputFuncName = "outputdata";
+                        std::string inputFuncName = "inputdata";
+	        	        if (experiment.spatial) {
+                            agent.newRTCFunction(agentName + outputFuncName, outputdata).setMessageOutput(messageName);
+                            agent.newRTCFunction(agentName + inputFuncName, inputdata).setMessageInput(messageName);
+	        	        } else {
+                            agent.newRTCFunction(agentName + outputFuncName, outputdataBruteForce).setMessageOutput(messageName);
+                            agent.newRTCFunction(agentName + inputFuncName, inputdataBruteForce).setMessageInput(messageName);
+	        	        }
+	        
+                    }
 
-            /**
-            * Control flow
-            */     
-            model.addInitFunction(Init);
-            {   // Layer #1
-                flamegpu::LayerDescription &layer = model.newLayer();
-                std::string agentName = "Boid";
-                std::string outputFuncName = "outputdata";
-                layer.addAgentFunction(agentName, agentName + outputFuncName);
-            }
-            {   // Layer #2
-                flamegpu::LayerDescription &layer = model.newLayer();
-                std::string agentName = "Boid";
-                std::string inputFuncName = "inputdata";
-                layer.addAgentFunction(agentName, agentName + inputFuncName);
-            }
+                    /**
+                    * Control flow
+                    */     
+                    model.addInitFunction(Init);
+                    {   // Layer #1
+                        flamegpu::LayerDescription &layer = model.newLayer();
+                        std::string agentName = "Boid";
+                        std::string outputFuncName = "outputdata";
+                        layer.addAgentFunction(agentName, agentName + outputFuncName);
+                    }
+                    {   // Layer #2
+                        flamegpu::LayerDescription &layer = model.newLayer();
+                        std::string agentName = "Boid";
+                        std::string inputFuncName = "inputdata";
+                        layer.addAgentFunction(agentName, agentName + inputFuncName);
+                    }
 
-            /**
-            * Execution
-            */
-            std::cout << "Running ensemble size: " << ensembleSize << std::endl;
-            unsigned int runsRemaining = experiment.totalRuns;
-            const auto startTime = std::chrono::system_clock::now();
-            while (runsRemaining) {
-                flamegpu::RunPlanVector runs(model, ensembleSize);
-                {
-                    runs.setSteps(experiment.steps);
-                }
-                
-                flamegpu::CUDAEnsemble cuda_ensemble(model, argc, argv);              
-                cuda_ensemble.simulate(runs);
-                runsRemaining -= ensembleSize;
-            }
-            const auto endTime = std::chrono::system_clock::now();
-            const auto runTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-            
-            std::cout << "Run complete. Total run time: " << runTime << "s" << std::endl;
-            csv << "0," << popSize << "," << ensembleSize << "," << runTime << std::endl;
+                    /**
+                    * Execution
+                    */
+                    std::cout << "Running ensemble size: " << ensembleSize << std::endl;
+                    unsigned int runsRemaining = experiment.totalRuns;
+                    const auto startTime = std::chrono::system_clock::now();
+                    while (runsRemaining) {
+                        flamegpu::RunPlanVector runs(model, ensembleSize);
+                        {
+                            runs.setSteps(experiment.steps);
+                            
+                            // On the dummy run to force RTC compilation, only need a single step as results are discarded
+                            if (repetition < 0) {
+                                runs.setSteps(1);
+                            }
+                        }
+                        
+                        flamegpu::CUDAEnsemble cuda_ensemble(model, argc, argv);              
+                        cuda_ensemble.Config().out_format = "";
+                        cuda_ensemble.Config().quiet = true;
+                        cuda_ensemble.simulate(runs);
+                        runsRemaining -= ensembleSize;
+                    }
+                    const auto endTime = std::chrono::system_clock::now();
+                    const auto runTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+                    
+                    std::cout << "Run complete. Total run time: " << runTime / 1000.0 << "s" << std::endl;
+                    // Only log if this isn't the dummy RTC compilation run
+                    if (repetition >= 0) {
+                        csv << repetition << "," << popSize << "," << ensembleSize << "," << runTime / 1000.0 << std::endl;
+                    }
 
 #ifdef VISUALISATION
-            visualisation.join();
-            visualisation.close();
+                    visualisation.join();
+                    visualisation.close();
 #endif
-        }
-    }
+                }
+            }
+        }  
     }
 
     return 0;
