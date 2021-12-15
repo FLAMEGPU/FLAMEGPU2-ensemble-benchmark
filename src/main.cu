@@ -664,7 +664,7 @@ int main(int argc, const char ** argv) {
         csv << "repetition,pop_size,ensemble_size,s_sim_mean" << std::endl;
    
         for (int repetition = -1; repetition < experiment.repetitions; repetition++) {
-            std::cout << "Beginning repetiton " << repetition;
+            std::cout << "Beginning repetiton " << repetition << std::endl;
             for (unsigned int popSize = experiment.initialPopSize; popSize <= experiment.finalPopSize; popSize += experiment.popSizeIncrement) {
                 for (unsigned int ensembleSize : experiment.ensembleSizes) {
                     std::cout << "Staring run with popSize: " << popSize << ", species: " << ensembleSize << std::endl;
