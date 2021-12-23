@@ -1,110 +1,97 @@
-# FLAMEGPU2 Ensemble Experiments
+# FLAMEGPU2 Ensemble Benchmark
 
-This repository contains the figures relating to ensembles shown in the talk *Simulate the World and Everything in It: Complex Systems Simulations with FGPU2* given by Paul Richmond at [GTC 2021](https://www.nvidia.com/en-us/gtc/topics/developer-tools/), along with the code to generate them. The code demonstrates the effect and scaling of the concurrency feature of the FLAMEGPU2 agent-based modelling framework. Please note that generated figures may differ slightly as a result of the stochastic nature of the simulations and hardware differences.
+This repository contains performance benchmarking of a [FLAME GPU 2](https://github.com/FLAMEGPU/FLAMEGPU2) implementation of Boids agent based model running multiple concurrent simulations.
 
-## Figures
+The code demonstrates the effect and scaling of the concurrency feature of the FLAMEGPU2 agent-based modelling framework.
+
+
+## Benchmark Description and Results
+
+Three experiments are undertaken within this benchmark. There is a range of raw data in the [`sample/data`](sample/data) directory with a description of the machine configurations used to generate it in each directory.
+
+The results below are from the V100 runs on the Bessemer HPC system at the University of Sheffield. Job submission scripts are included in the [`scripts/slurm`]() folder.
 
 ### Small Populations (Brute force)
 
-![Figure 2.1](./results/figures/small--small_pop_brute_force.png)
-*__Small populations brute force__ This figure shows how the average simulation time scales with ensemble size for different population sizes of a brute force messaging boids model.*
+This figure shows how the average simulation time scales with ensemble size for different population sizes of a brute force messaging Boids model.
+	+ Population sizes are stepped between 128 and 1024 at intervals of 128
+	+ Simulation timing is measured over 500 steps
 
-Generated using an `NVIDIA Titan V` GPU.
+![sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/small--small_pop_brute_force.png](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/small--small_pop_brute_force.png)
+
 
 ### Small Populations (Spatial)
 
-![Figure 2.1](./results/figures/small--small_pop.png)
-*__Small populations spatial__ This figure shows how the average simulation time scales with ensemble size for different population sizes of a spatial messaging boids model.*
+This figure shows how the average simulation time scales with ensemble size for different population sizes of a spatial messaging Boids model.
+	+ Population sizes are stepped between 128 and 1024 at intervals of 128
+	+ Simulation timing is measured over 500 steps
 
-Generated using an `NVIDIA Titan V` GPU.
+![sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/small--small_pop.png](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/small--small_pop.png)
 
 ### Large Populations (Brute force)
 
-![Figure 2.1](./results/figures/large--large_pop_brute_force.png)
-*__Large populations brute force__ This figure shows how the average simulation time scales with ensemble size for different large population sizes of a brute force messaging boids model.*
+This figure shows how the average simulation time scales with ensemble size for different large population sizes of a brute force messaging Boids model.
+	+ Population sizes are stepped between 2048 and 8192 at intervals of 2048
+	+ Simulation timing is measured over 500 steps
 
-Generated using an `NVIDIA Titan V` GPU.
+![sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/large--large_pop_brute_force.png](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/large--large_pop_brute_force.png)
 
 ### Large Populations (Spatial)
 
-![Figure 2.1](./results/figures/large--large_pop.png)
-*__Large populations spatial__ This figure shows how the average simulation time scales with ensemble size for different large population sizes of a spatial messaging boids model.*
+This figure shows how the average simulation time scales with ensemble size for different large population sizes of a spatial messaging Boids model.
+	+ Population sizes are stepped between 2048 and 8192 at intervals of 2048
+	+ Simulation timing is measured over 500 steps
 
-Generated using an `NVIDIA Titan V` GPU.
+![sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/large--large_pop.png](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/large--large_pop.png)
 
-## Building the Experiments
+## Building and Running the Benchmark
 
-[FLAMEGPU2](https://github.com/FLAMEGPU/FLAMEGPU2) is downloaded via CMake and configured as a dependency of the project.
+Detail of dependencies and the `cmake` build process are described in full in the [FLAMEGPU2-example-template Repo](https://github.com/FLAMEGPU/FLAMEGPU2-example-template) and are not repeated here. The benchmark should be built with seatbelts off (e.g. `-DSEATBELTS=OFF` passed to the `cmake` configuration step) to disable additional run-time checks and optionally disabling Python Swig support which is not needed for this model(-DBUILD_SWIG_PYTHON=OFF ). E.g. for Volta (`SM_70`) GPUs under Linux.
+
+```bash
+# Configure 
+cmake . -B build -DCMAKE_BUILD_TYPE=Release -DSEATBELTS=OFF -DBUILD_SWIG_PYTHON=OFF -DCUDA_ARCH=70
+cmake --build build -j`nproc` 
+make
+```
+
+### Execution and Data generation
+
+The `FLAMEGPU2_INC_DIR` environment variable must be set for run-time compilation (TRC) to succeed. This can be done at the same time as execution of the model. E.g. 
+
+```bash
+cd build
+FLAMEGPU2_INC_DIR=./_deps/flamegpu2-src/include/ ./bin/Release/ensemble-benchmark 
+```
+
+This will produce 6 `.csv` files in the `build` directory.
+
+## Plotting Results
 
 ### Dependencies
 
-The dependencies below are required for building FLAME GPU 2.
 
-+ [CMake](https://cmake.org/download/) `>= 3.18`
-+ [CUDA](https://developer.nvidia.com/cuda-downloads) `>= 11.0` and a Compute Capability `>= 3.5` NVIDIA GPU.
-  + CUDA `>= 10.0` currently works, but support will be dropped in a future release.
-+ C++17 capable C++ compiler (host), compatible with the installed CUDA version
-  + [Microsoft Visual Studio 2019](https://visualstudio.microsoft.com/) (Windows)
-  + [make](https://www.gnu.org/software/make/) and [GCC](https://gcc.gnu.org/) `>= 7`(Linux)
-  + Older C++ compilers which support C++14 may currently work, but support will be dropped in a future release.
-+ [git](https://git-scm.com/)
+Figures can be generated from data in CSV files via a python script.
 
-### Building FLAME GPU 2
+It is recommended to use python virtual environment or conda environment for plotting dependencies.
 
-FLAME GPU 2 uses [CMake](https://cmake.org/), as a cross-platform process, for configuring and generating build directives, e.g. `Makefile` or `.vcxproj`. This is used to build the FLAMEGPU2 library, examples, tests and documentation.
-
-Below the core commands are provided, for the full guide refer to the main [FLAMEGPU2 guide](https://github.com/FLAMEGPU/FLAMEGPU2/blob/master/README.md).
-
-#### Linux
-
-Under Linux, `cmake` can be used to generate makefiles specific to your system:
+I.e. for linux to install the dependencies into a python3 virtual environment and plot the data within `build/performance_scaling.csv`
 
 ```bash
-mkdir -p build && cd build
-cmake .. 
-make -j8
+# From the root of the repository
+# Create the venv
+python3 -m venv .venv
+# Activate the venv
+source .venv/bin/activate
+# Install the dependencies via pip
+python3 -m pip install -Ur requirements.txt
+# Plot using csv files contained within the build directory
+python3 plot.py build -o build/figures
+# Use -h / --help for more information on optional plotting script parameters.
 ```
 
-The option `-j8` enables parallel compilation using upto 8 threads, this is recommended to improve build times.
-
-By default a `Makefile` for the `Release` build configuration will be generated. This is the configuration which was used to generate the results for the paper/talk.
-
-#### Windows
-
-*Note: If installing CMake on Windows ensure CMake is added to the system path, allowing `cmake` to be used via `cmd`, this option is disabled within the installer by default.*
-
-When generating Visual studio project files, using `cmake` (or `cmake-gui`), the platform **must** be specified as `x64`.
-
-Using `cmake` this takes the form `-A x64`:
+The sample figures were generated from the root directory using
 
 ```bash
-mkdir build && cd build
-cmake .. -A x64
-ALL_BUILD.sln
+python3 plot.py sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/data-figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff
 ```
-
-## Running the Experiments
-
-By default all experiments are run and data will be generated to create all of the figures.
-
-To run the experiments, run the generated binary file which will be found in `bin/{platform}/Release/`
-
-## Generating Graphs
-
-### Required
-
-+ [Python](https://www.python.org/downloads/) >= 3.0: Required for generating graphs
-  + `numpy`
-  + `pandas`
-  + `matplotlib`
-  + `seaborn`
-
-### Graph Generation
-
-Run the command
-
-```bash
-python3 ../results/plot.py . -o .
-```
-
-from the `build` folder. This will generate the figures in the `figures` folder
