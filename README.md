@@ -9,7 +9,7 @@ The code demonstrates the effect and scaling the number of concurrent simulation
 
 A number of experiments are undertaken within this benchmark. There is a range of raw data in the [`sample/data`](sample/data) directory with a description of the machine configurations used to generate it in each directory.
 
-The results below are from the V100 runs on the Bessemer HPC system at the University of Sheffield. Job submission scripts are included in the [`scripts/slurm`](`scripts/slurm`) folder.
+The results below are from the V100 runs on the Bessemer HPC system at the University of Sheffield. Job submission scripts are included in the [`scripts/slurm`](scripts/slurm) folder.
 
 ### Small Populations (Brute force)
 
