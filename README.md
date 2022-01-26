@@ -4,6 +4,10 @@ This repository contains performance benchmarking of a [FLAME GPU 2](https://git
 
 The code demonstrates the effect and scaling the number of concurrent simulation using the ensemble feature of the FLAMEGPU2 agent-based modelling framework.
 
+A combined figure for use in publication is shown below. For details please refer to the publication.
+
+[![Combined Benchmark Figure](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/paper_figure.png)](sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff/paper_figure.png)
+
 
 ## Benchmark Description and Results
 
@@ -71,7 +75,7 @@ Note: The `FLAMEGPU2_INC_DIR` environment variable may need to be set to `./_dep
 
 ## Plotting Results
 
-Figures can be generated from data in CSV files via a python script.
+Individual figures can be generated from data in CSV files via a python script `plot.py`. Alternatively a combined figure used for publication can be produced using `plot_publication.py`.
 
 ### Dependencies
 
@@ -96,4 +100,10 @@ The sample figures were generated from the root directory using
 
 ```bash
 python3 plot.py sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff
+```
+
+The publication figure was generated using 
+
+```bash
+python3 plot_publication.py sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff
 ```
