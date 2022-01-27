@@ -105,5 +105,5 @@ python3 plot.py sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/
 The publication figure was generated using 
 
 ```bash
-python3 plot_publication.py sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff
+python3 plot_publication.py -i sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff -o sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff
 ```
