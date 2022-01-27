@@ -14,7 +14,7 @@ import pathlib
 DEFAULT_DPI = 300
 
 # Default directory for visualisation images
-DEFAULT_INPUT_DIR= "./sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff"
+DEFAULT_INPUT_DIR= "." #"./sample/data/v100-470.82.01/alpha.2-v100-11.0-beltsoff"
 DEFAULT_OUTPUT_DIR = "." #"./sample/figures/v100-470.82.01/alpha.2-v100-11.0-beltsoff"
 
 # Drift csv filename from simulation output
@@ -23,8 +23,10 @@ LARGE_POP_BF_CSV_FILENAME = "large_pop_brute_force.csv"
 SMALL_POP_SPATIAL_CSV_FILENAME = "small_pop.csv"
 LARGE_POP_SPATIAL_CSV_FILENAME = "large_pop.csv"
 
+EXPECTED_INPUT_FILES = [SMALL_POP_BF_CSV_FILENAME, LARGE_POP_BF_CSV_FILENAME, SMALL_POP_SPATIAL_CSV_FILENAME, LARGE_POP_SPATIAL_CSV_FILENAME]
 
-EXPECTED_INPUT_FILES = [LARGE_POP_BF_CSV_FILENAME]
+SMALL_POP_SIZES = [128, 256, 512, 1024]
+LARGE_POP_SIZES = [2048, 4096, 8192]
 
 MODEL_NAME_MAP = {'circles_bruteforce': "Brute Force", 
                   'circles_spatial3D': "Spatial", 
@@ -119,16 +121,15 @@ def main():
     input_dir = pathlib.Path(args.input_dir)
     
     # common palette
-    colours = sns.color_palette("viridis", 8)
-    custom_palette = {128: colours[0], 256: colours[1], 512: colours[2], 1024: colours[3], 2048: colours[4], 4096: colours[5], 6144: colours[6], 8192: colours[7]}
-
+    colours = sns.color_palette("viridis", len(SMALL_POP_SIZES+LARGE_POP_SIZES))
+    custom_palette = {v: colours[i] for i, v in enumerate(SMALL_POP_SIZES+LARGE_POP_SIZES)}
     
     # SMALL_POP_BF_CSV_FILENAME
     # Load per simulation step data into data frame (strip any white space)
     df = pd.read_csv(input_dir/SMALL_POP_BF_CSV_FILENAME, sep=',', quotechar='"')
     df.columns = df.columns.str.strip()
     # select subset of the pop sizes for plotting
-    df = df[df['pop_size'].isin([128, 256, 512, 1024])]
+    df = df[df['pop_size'].isin(SMALL_POP_SIZES)]
     # calculate baseline and the speedup
     df_baseline = df.query('ensemble_size == 1').groupby('pop_size', as_index=False).mean()[['pop_size',  's_sim_mean']]
     df = df.merge(df_baseline, left_on='pop_size', right_on='pop_size', suffixes=('', '_baseline'))
@@ -146,7 +147,7 @@ def main():
     df = pd.read_csv(input_dir/SMALL_POP_SPATIAL_CSV_FILENAME, sep=',', quotechar='"')
     df.columns = df.columns.str.strip()
     # select subset of the pop sizes for plotting
-    df = df[df['pop_size'].isin([128, 256, 512, 1024])]
+    df = df[df['pop_size'].isin(SMALL_POP_SIZES)]
     # calculate baseline and the speedup
     df_baseline = df.query('ensemble_size == 1').groupby('pop_size', as_index=False).mean()[['pop_size',  's_sim_mean']]
     df = df.merge(df_baseline, left_on='pop_size', right_on='pop_size', suffixes=('', '_baseline'))
@@ -164,7 +165,7 @@ def main():
     df = pd.read_csv(input_dir/LARGE_POP_SPATIAL_CSV_FILENAME, sep=',', quotechar='"')
     df.columns = df.columns.str.strip()
     # select subset of the pop sizes for plotting
-    df = df[df['pop_size'].isin([2048, 4096, 6144, 8192])]
+    df = df[df['pop_size'].isin(LARGE_POP_SIZES)]
     # calculate baseline and the speedup
     df_baseline = df.query('ensemble_size == 1').groupby('pop_size', as_index=False).mean()[['pop_size',  's_sim_mean']]
     df = df.merge(df_baseline, left_on='pop_size', right_on='pop_size', suffixes=('', '_baseline'))
@@ -183,7 +184,7 @@ def main():
     df = pd.read_csv(input_dir/LARGE_POP_SPATIAL_CSV_FILENAME, sep=',', quotechar='"')
     df.columns = df.columns.str.strip()
     # select subset of the pop sizes for plotting
-    df = df[df['pop_size'].isin([2048, 4096, 6144, 8192])]
+    df = df[df['pop_size'].isin(LARGE_POP_SIZES)]
     # calculate baseline and the speedup
     df_baseline = df.query('ensemble_size == 1').groupby('pop_size', as_index=False).mean()[['pop_size',  's_sim_mean']]
     df = df.merge(df_baseline, left_on='pop_size', right_on='pop_size', suffixes=('', '_baseline'))
@@ -209,7 +210,7 @@ def main():
     #f.tight_layout()
     output_dir = pathlib.Path(args.output_dir) 
     f.savefig(output_dir/"paper_figure.png", dpi=args.dpi) 
-    f.savefig(output_dir/"paper_figure.eps", format='eps', dpi=args.dpi)
+    f.savefig(output_dir/"paper_figure.pdf", format='pdf', dpi=args.dpi)
     
     #plt.show()
 
