@@ -6,7 +6,7 @@
 # 1 GPU
 #SBATCH --gres=gpu:1
 # 1 CPU core - might want to increase this + memory to 1/4 of the node per GPU?
-#SBATCH --ntasks=1
+#SBATCH --ntasks=20
 
 # Load modules (with matching gcc versions)
 module use /usr/local/modulefiles/staging/eb/all/
