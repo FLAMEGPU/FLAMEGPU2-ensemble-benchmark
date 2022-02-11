@@ -160,9 +160,9 @@ def main():
     ax['p2'].set_title(label='B', loc='left', fontweight="bold")
     ax['p2'].legend().set_visible(False)
     
-    # LARGE_POP_SPATIAL_CSV_FILENAME
+    # LARGE_POP_BF_CSV_FILENAME
     # Load per simulation step data into data frame (strip any white space)
-    df = pd.read_csv(input_dir/LARGE_POP_SPATIAL_CSV_FILENAME, sep=',', quotechar='"')
+    df = pd.read_csv(input_dir/LARGE_POP_BF_CSV_FILENAME, sep=',', quotechar='"')
     df.columns = df.columns.str.strip()
     # select subset of the pop sizes for plotting
     df = df[df['pop_size'].isin(LARGE_POP_SIZES)]
