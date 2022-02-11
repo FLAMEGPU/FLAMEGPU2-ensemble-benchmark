@@ -1,6 +1,6 @@
 #!/bin/bash
 # Will need to increase the time for full benchmark runs.... 
-#SBATCH --time=8:00:00
+#SBATCH --time=72:00:00
 #SBATCH --partition=dcs-gpu
 #SBATCH --account=dcs-res
 # 1 GPU
