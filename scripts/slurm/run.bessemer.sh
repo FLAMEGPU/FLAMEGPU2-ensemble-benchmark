@@ -27,4 +27,4 @@ export FLAMEGPU2_INC_DIR=_deps/flamegpu2-src/include
 nvidia-smi
 
 # Run the executable.
-./bin/Release/ensemble-benchmark
+./bin/Release/ensemble_benchmark
