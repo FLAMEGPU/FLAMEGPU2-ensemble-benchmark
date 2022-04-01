@@ -791,6 +791,7 @@ int main(int argc, const char ** argv) {
                         flamegpu::CUDAEnsemble cuda_ensemble(model, argc, argv);              
                         cuda_ensemble.Config().out_format = "";
                         cuda_ensemble.Config().quiet = true;
+                        cuda_ensemble.Config().concurrent_runs = 10;
                         cuda_ensemble.simulate(runs);
                         runsRemaining -= ensembleSize;
                     }
