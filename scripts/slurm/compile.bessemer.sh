@@ -2,6 +2,9 @@
 #SBATCH --time=00:30:00
 #SBATCH --ntasks=4
 #SBATCH --job-name=compile.bessemer.sh
+#SBATCH --partition=dcs-gpu
+#SBATCH --account=dcs-res
+#SBATCH --gres=gpu:1
 
 # Load modules for compilation
 module use /usr/local/modulefiles/staging/eb/all/
