@@ -645,6 +645,9 @@ int main(int argc, const char ** argv) {
     
     const int repetitions = 3;
 
+    Experiment smallPopBruteForce_timeline("small_pop_brute_force_timeline", 1024, 1024, 1, 60, std::vector<unsigned int> {60}, 1, 500, false);
+    Experiment largePop_timeline("large_pop_timeline", 8192, 8192, 1, 60, std::vector<unsigned int> {60}, 1, 500, true);
+    
     Experiment smallPopBruteForce("small_pop_brute_force", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, false);
     Experiment largePopBruteForce("large_pop_brute_force", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, false);
     Experiment veryLargePopBruteForce("very_large_pop_brute_force", 5000, 5000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, false);
@@ -653,7 +656,9 @@ int main(int argc, const char ** argv) {
     Experiment largePop("large_pop", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
     Experiment veryLargePop("very_large_pop_brute_force", 5000, 20000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
    
-    std::vector<Experiment> experiments = { smallPopBruteForce, largePopBruteForce };
+    //std::vector<Experiment> experiments = { smallPopBruteForce_timeline };
+    std::vector<Experiment> experiments = { largePop_timeline };
+    //std::vector<Experiment> experiments = { smallPopBruteForce, largePopBruteForce };
     //std::vector<Experiment> experiments = {smallPop, largePop, smallPopBruteForce, largePopBruteForce };
     //std::vector<Experiment> experiments = {smallPop, largePop};
 
@@ -791,7 +796,7 @@ int main(int argc, const char ** argv) {
                         
                         flamegpu::CUDAEnsemble cuda_ensemble(model, argc, argv);              
                         cuda_ensemble.Config().out_format = "";
-                        cuda_ensemble.Config().quiet = true;
+                        cuda_ensemble.Config().quiet = false;
                         cuda_ensemble.Config().concurrent_runs = 10;
                         cuda_ensemble.Config().devices = {0};
                         cuda_ensemble.simulate(runs);
