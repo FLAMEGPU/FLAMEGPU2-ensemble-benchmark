@@ -5,7 +5,8 @@ project(ensemble_benchmark CUDA CXX)
 
 # Optionaly set the version of flamegpu which should be used.
 # Use a branch name such as `master`, or a tagged version such as `v2.0.0-alpha` 
-set(FLAMEGPU_VERSION "cf64fd9230819f4cc1a092202c3b94a7efbbad8e" CACHE STRING "Git branch or tag to use")
+# Temp changed to head of branch remove_more_default_stream
+set(FLAMEGPU_VERSION "2bc73ac30b418582e40d5cf699222c020327a954" CACHE STRING "Git branch or tag to use")
 
 # Our core dependency is FLAMEGPU2 lib, first lets find it
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/flamegpu2.cmake)

@@ -653,7 +653,8 @@ int main(int argc, const char ** argv) {
     Experiment largePop("large_pop", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
     Experiment veryLargePop("very_large_pop_brute_force", 5000, 20000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
    
-    std::vector<Experiment> experiments = {smallPopBruteForce, largePopBruteForce, smallPop, largePop};
+    std::vector<Experiment> experiments = { smallPopBruteForce, largePopBruteForce };
+    //std::vector<Experiment> experiments = {smallPop, largePop, smallPopBruteForce, largePopBruteForce };
     //std::vector<Experiment> experiments = {smallPop, largePop};
 
     for (auto experiment : experiments) {
@@ -792,6 +793,7 @@ int main(int argc, const char ** argv) {
                         cuda_ensemble.Config().out_format = "";
                         cuda_ensemble.Config().quiet = true;
                         cuda_ensemble.Config().concurrent_runs = 10;
+                        cuda_ensemble.Config().devices = {0};
                         cuda_ensemble.simulate(runs);
                         runsRemaining -= ensembleSize;
                     }
