@@ -645,16 +645,16 @@ int main(int argc, const char ** argv) {
     
     const int repetitions = 3;
 
-    Experiment smallPopBruteForce("small_pop_brute_force", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, false);
-    Experiment largePopBruteForce("large_pop_brute_force", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, false);
+    Experiment smallPopBruteForce("small_pop_brute_force", 128, 1024, 128, 128, std::vector<unsigned int> {1, 2, 4, 6, 8, 10, 12, 14, 16}, repetitions, 500, false);
+    Experiment largePopBruteForce("large_pop_brute_force", 2048, 8192, 2048, 128, std::vector<unsigned int> {1, 2, 4, 6, 8, 10, 12, 14, 16}, repetitions, 500, false);
     Experiment veryLargePopBruteForce("very_large_pop_brute_force", 5000, 5000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, false);
     
-    Experiment smallPop("small_pop", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
-    Experiment largePop("large_pop", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
+    Experiment smallPop("small_pop", 128, 1024, 128, 128, std::vector<unsigned int> {1, 2, 4, 6, 8, 10, 12, 14, 16}, repetitions, 500, true);
+    Experiment largePop("large_pop", 2048, 8192, 2048, 128, std::vector<unsigned int> {1, 2, 4, 6, 8, 10, 12, 14, 16}, repetitions, 500, true);
     Experiment veryLargePop("very_large_pop_brute_force", 5000, 20000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
    
-    std::vector<Experiment> experiments = { smallPopBruteForce, largePopBruteForce };
-    //std::vector<Experiment> experiments = {smallPop, largePop, smallPopBruteForce, largePopBruteForce };
+    //std::vector<Experiment> experiments = { smallPopBruteForce, largePopBruteForce };
+    std::vector<Experiment> experiments = {smallPop, largePop, smallPopBruteForce, largePopBruteForce };
     //std::vector<Experiment> experiments = {smallPop, largePop};
 
     for (auto experiment : experiments) {
@@ -774,10 +774,9 @@ int main(int argc, const char ** argv) {
                     * Execution
                     */
                     std::cout << "Running ensemble size: " << ensembleSize << std::endl;
-                    unsigned int runsRemaining = experiment.totalRuns;
                     const auto startTime = std::chrono::system_clock::now();
-                    while (runsRemaining) {
-                        flamegpu::RunPlanVector runs(model, ensembleSize);
+                    {
+                        flamegpu::RunPlanVector runs(model, experiment.totalRuns);
                         {
                             runs.setSteps(experiment.steps);
                             
@@ -792,10 +791,9 @@ int main(int argc, const char ** argv) {
                         flamegpu::CUDAEnsemble cuda_ensemble(model, argc, argv);              
                         cuda_ensemble.Config().out_format = "";
                         cuda_ensemble.Config().quiet = true;
-                        cuda_ensemble.Config().concurrent_runs = 10;
+                        cuda_ensemble.Config().concurrent_runs = ensembleSize;
                         cuda_ensemble.Config().devices = {0};
                         cuda_ensemble.simulate(runs);
-                        runsRemaining -= ensembleSize;
                     }
                     const auto endTime = std::chrono::system_clock::now();
                     const auto runTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
