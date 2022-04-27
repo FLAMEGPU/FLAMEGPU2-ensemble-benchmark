@@ -668,7 +668,7 @@ int main(int argc, const char ** argv) {
             std::cout << "Beginning repetiton " << repetition << std::endl;
             for (unsigned int popSize = experiment.initialPopSize; popSize <= experiment.finalPopSize; popSize += experiment.popSizeIncrement) {
                 for (unsigned int ensembleSize : experiment.ensembleSizes) {
-                    std::cout << "Staring run with popSize: " << popSize << ", species: " << ensembleSize << std::endl;
+                    std::cout << "Staring run with popSize: " << popSize << ", concurrent_runs: " << ensembleSize << std::endl;
                     flamegpu::ModelDescription model("Boids_Ensemble");
 
                     /**
