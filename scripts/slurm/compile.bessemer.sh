@@ -1,10 +1,9 @@
 #!/bin/bash
 #SBATCH --time=00:30:00
-#SBATCH --ntasks=4
 #SBATCH --job-name=compile.bessemer.sh
-#SBATCH --partition=dcs-gpu
-#SBATCH --account=dcs-res
-#SBATCH --gres=gpu:1
+# 8 CPU cores + enough memory (< 8/40ths of the node memory)
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=32G
 
 # Load modules for compilation
 module use /usr/local/modulefiles/staging/eb/all/
@@ -16,9 +15,6 @@ module load Anaconda3/5.3.0
 conda create -n fgpu2-ensemble-benchmark
 source activate fgpu2-ensemble-benchmark
 conda install -y cmake=3.18
-
-# Make sure temporary directory exists, used for RTC cache
-mkdir -p $TMPDIR
 
 # Set the location of the project root relative to this script
 PROJECT_ROOT=../..
@@ -32,5 +28,5 @@ mkdir -p build && cd build
 # Configure cmake.
 cmake .. -DCUDA_ARCH=70 -DCMAKE_BUILD_TYPE=Release -DSEATBELTS=OFF 
 
-# Compile the code with make for GPUs in Bessener (SM_70)
-make -j `nproc`
+# Compile the code
+cmake --build . -j `nproc`
