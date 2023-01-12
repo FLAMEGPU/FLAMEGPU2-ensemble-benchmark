@@ -395,6 +395,7 @@ FLAMEGPU_AGENT_FUNCTION(inputdata, flamegpu::MessageSpatial3D, flamegpu::Message
     return flamegpu::ALIVE;
 }
 )###";
+
 const char* inputdataBruteForce = R"###(
 // Vector utility functions, see top of file for versions with commentary
 FLAMEGPU_HOST_DEVICE_FUNCTION float vec3Length(const float x, const float y, const float z) {
@@ -674,7 +675,7 @@ int main(int argc, const char ** argv) {
                     /**
                     * GLOBALS
                     */
-                    flamegpu::EnvironmentDescription &env = model.Environment();
+                    flamegpu::EnvironmentDescription env = model.Environment();
                     {
                         // Population size to generate, if no agents are loaded from disk
                         env.newProperty("POPULATION_TO_GENERATE", popSize);
@@ -704,7 +705,7 @@ int main(int argc, const char ** argv) {
                     {   // Location message      
                         std::string messageName = "location";
 	        	        if (experiment.spatial) {
-                            flamegpu::MessageSpatial3D::Description &message = model.newMessage<flamegpu::MessageSpatial3D>(messageName);
+                            flamegpu::MessageSpatial3D::Description message = model.newMessage<flamegpu::MessageSpatial3D>(messageName);
                             // Set the range and bounds.
                             message.setRadius(env.getProperty<float>("INTERACTION_RADIUS"));
                             message.setMin(env.getProperty<float>("MIN_POSITION"), env.getProperty<float>("MIN_POSITION"), env.getProperty<float>("MIN_POSITION"));
@@ -719,7 +720,7 @@ int main(int argc, const char ** argv) {
                             message.newVariable<float>("fy");
                             message.newVariable<float>("fz");
                         } else {
-	        	            flamegpu::MessageBruteForce::Description &message = model.newMessage<flamegpu::MessageBruteForce>(messageName);
+	        	            flamegpu::MessageBruteForce::Description message = model.newMessage<flamegpu::MessageBruteForce>(messageName);
                             // A message to hold the location of an agent.
                             message.newVariable<int>("id");
                             message.newVariable<float>("x");
@@ -732,7 +733,7 @@ int main(int argc, const char ** argv) {
                     }
                     {   // Boid agent
                         std::string agentName("Boid");
-                        flamegpu::AgentDescription &agent = model.newAgent(agentName);
+                        flamegpu::AgentDescription agent = model.newAgent(agentName);
                         agent.newVariable<int>("id");
                         agent.newVariable<float>("x");
                         agent.newVariable<float>("y");
@@ -758,13 +759,13 @@ int main(int argc, const char ** argv) {
                     */     
                     model.addInitFunction(Init);
                     {   // Layer #1
-                        flamegpu::LayerDescription &layer = model.newLayer();
+                        flamegpu::LayerDescription layer = model.newLayer();
                         std::string agentName = "Boid";
                         std::string outputFuncName = "outputdata";
                         layer.addAgentFunction(agentName, agentName + outputFuncName);
                     }
                     {   // Layer #2
-                        flamegpu::LayerDescription &layer = model.newLayer();
+                        flamegpu::LayerDescription layer = model.newLayer();
                         std::string agentName = "Boid";
                         std::string inputFuncName = "inputdata";
                         layer.addAgentFunction(agentName, agentName + inputFuncName);
@@ -790,7 +791,8 @@ int main(int argc, const char ** argv) {
                         
                         flamegpu::CUDAEnsemble cuda_ensemble(model, argc, argv);              
                         cuda_ensemble.Config().out_format = "";
-                        cuda_ensemble.Config().quiet = true;
+                        cuda_ensemble.Config().verbosity = flamegpu::Verbosity::Quiet;
+                        cuda_ensemble.Config().telemetry = false;
                         cuda_ensemble.Config().concurrent_runs = ensembleSize;
                         cuda_ensemble.Config().devices = {0};
                         cuda_ensemble.simulate(runs);
@@ -804,10 +806,6 @@ int main(int argc, const char ** argv) {
                         csv << repetition << "," << popSize << "," << ensembleSize << "," << runTime / 1000.0 << std::endl;
                     }
 
-#ifdef VISUALISATION
-                    visualisation.join();
-                    visualisation.close();
-#endif
                 }
             }
         }  
