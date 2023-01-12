@@ -658,6 +658,9 @@ int main(int argc, const char ** argv) {
     std::vector<Experiment> experiments = {smallPop, largePop, smallPopBruteForce, largePopBruteForce };
     //std::vector<Experiment> experiments = {smallPop, largePop};
 
+    // Suppress telemetry encouragement notice 
+    flamegpu::io::Telemetry::suppressNotice();
+    
     for (auto experiment : experiments) {
 
         // Pandas
