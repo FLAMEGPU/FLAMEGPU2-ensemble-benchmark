@@ -6,7 +6,7 @@ The code demonstrates the effect and scaling the number of concurrent simulation
 
 A combined figure for use in publication is shown below. For details please refer to the publication.
 
-[![Combined Benchmark Figure](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/paper_figure.png)](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/paper_figure.png)
+[![Combined Benchmark Figure](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/paper_figure.png)](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/paper_figure.png)
 
 ## Benchmark Description and Results
 
@@ -21,7 +21,7 @@ This figure shows how the average simulation time scales with ensemble size for 
 + Population sizes are stepped between 128 and 1024 at intervals of 128
 + Simulation timing is measured over 500 steps
 
-![sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/small--small_pop_brute_force.png](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/small--small_pop_brute_force.png)
+![sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/small--small_pop_brute_force.png](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/small--small_pop_brute_force.png)
 
 ### Small Populations (Spatial)
 
@@ -30,7 +30,7 @@ This figure shows how the average simulation time scales with ensemble size for 
 + Population sizes are stepped between 128 and 1024 at intervals of 128
 + Simulation timing is measured over 500 steps
 
-![sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/small--small_pop.png](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/small--small_pop.png)
+![sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/small--small_pop.png](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/small--small_pop.png)
 
 ### Large Populations (Brute force)
 
@@ -39,7 +39,7 @@ This figure shows how the average simulation time scales with ensemble size for 
 + Population sizes are stepped between 2048 and 8192 at intervals of 2048
 + Simulation timing is measured over 500 steps
 
-![sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/large--large_pop_brute_force.png](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/large--large_pop_brute_force.png)
+![sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/large--large_pop_brute_force.png](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/large--large_pop_brute_force.png)
 
 ### Large Populations (Spatial)
 
@@ -48,7 +48,7 @@ This figure shows how the average simulation time scales with ensemble size for 
 + Population sizes are stepped between 2048 and 8192 at intervals of 2048
 + Simulation timing is measured over 500 steps
 
-![sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/large--large_pop.png](sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff/large--large_pop.png)
+![sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/large--large_pop.png](sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff/large--large_pop.png)
 
 ## Building and Running the Benchmark
 
@@ -98,11 +98,11 @@ python3 plot.py build -o build/figures
 The sample figures were generated from the root directory using
 
 ```bash
-python3 plot.py sample/data/v100-515.65.01/2.00-rc-v100-11.0-beltsoff -o sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff
+python3 plot.py sample/data/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff -o sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff
 ```
 
 The publication figure was generated using 
 
 ```bash
-python3 plot_publication.py -i sample/data/v100-515.65.01/2.00-rc-v100-11.0-beltsoff -o sample/figures/v100-515.65.01/2.00-rc-v100-11.0-beltsoff
+python3 plot_publication.py -i sample/data/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff -o sample/figures/v100-515.65.01/2.0.0-rc-v100-11.0-beltsoff
 ```
