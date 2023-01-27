@@ -395,6 +395,7 @@ FLAMEGPU_AGENT_FUNCTION(inputdata, flamegpu::MessageSpatial3D, flamegpu::Message
     return flamegpu::ALIVE;
 }
 )###";
+
 const char* inputdataBruteForce = R"###(
 // Vector utility functions, see top of file for versions with commentary
 FLAMEGPU_HOST_DEVICE_FUNCTION float vec3Length(const float x, const float y, const float z) {
@@ -645,17 +646,21 @@ int main(int argc, const char ** argv) {
     
     const int repetitions = 3;
 
-    Experiment smallPopBruteForce("small_pop_brute_force", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, false);
-    Experiment largePopBruteForce("large_pop_brute_force", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, false);
+    Experiment smallPopBruteForce("small_pop_brute_force", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 15, 20}, repetitions, 500, false);
+    Experiment largePopBruteForce("large_pop_brute_force", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 15, 20}, repetitions, 500, false);
     Experiment veryLargePopBruteForce("very_large_pop_brute_force", 5000, 5000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, false);
     
-    Experiment smallPop("small_pop", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
-    Experiment largePop("large_pop", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
+    Experiment smallPop("small_pop", 128, 1024, 128, 60, std::vector<unsigned int> {1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 15, 20}, repetitions, 500, true);
+    Experiment largePop("large_pop", 2048, 8192, 2048, 60, std::vector<unsigned int> {1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 15, 20}, repetitions, 500, true);
     Experiment veryLargePop("very_large_pop_brute_force", 5000, 20000, 5000, 60, std::vector<unsigned int> {1, 2, 4, 5, 6, 10, 12, 15, 20, 30, 60}, repetitions, 500, true);
    
-    std::vector<Experiment> experiments = {smallPopBruteForce, largePopBruteForce, smallPop, largePop};
+    //std::vector<Experiment> experiments = { smallPopBruteForce, largePopBruteForce };
+    std::vector<Experiment> experiments = {smallPop, largePop, smallPopBruteForce, largePopBruteForce };
     //std::vector<Experiment> experiments = {smallPop, largePop};
 
+    // Suppress telemetry encouragement notice 
+    flamegpu::io::Telemetry::suppressNotice();
+    
     for (auto experiment : experiments) {
 
         // Pandas
@@ -667,13 +672,13 @@ int main(int argc, const char ** argv) {
             std::cout << "Beginning repetiton " << repetition << std::endl;
             for (unsigned int popSize = experiment.initialPopSize; popSize <= experiment.finalPopSize; popSize += experiment.popSizeIncrement) {
                 for (unsigned int ensembleSize : experiment.ensembleSizes) {
-                    std::cout << "Staring run with popSize: " << popSize << ", species: " << ensembleSize << std::endl;
+                    std::cout << "Staring run with popSize: " << popSize << ", concurrent_runs: " << ensembleSize << std::endl;
                     flamegpu::ModelDescription model("Boids_Ensemble");
 
                     /**
                     * GLOBALS
                     */
-                    flamegpu::EnvironmentDescription &env = model.Environment();
+                    flamegpu::EnvironmentDescription env = model.Environment();
                     {
                         // Population size to generate, if no agents are loaded from disk
                         env.newProperty("POPULATION_TO_GENERATE", popSize);
@@ -703,7 +708,7 @@ int main(int argc, const char ** argv) {
                     {   // Location message      
                         std::string messageName = "location";
 	        	        if (experiment.spatial) {
-                            flamegpu::MessageSpatial3D::Description &message = model.newMessage<flamegpu::MessageSpatial3D>(messageName);
+                            flamegpu::MessageSpatial3D::Description message = model.newMessage<flamegpu::MessageSpatial3D>(messageName);
                             // Set the range and bounds.
                             message.setRadius(env.getProperty<float>("INTERACTION_RADIUS"));
                             message.setMin(env.getProperty<float>("MIN_POSITION"), env.getProperty<float>("MIN_POSITION"), env.getProperty<float>("MIN_POSITION"));
@@ -718,7 +723,7 @@ int main(int argc, const char ** argv) {
                             message.newVariable<float>("fy");
                             message.newVariable<float>("fz");
                         } else {
-	        	            flamegpu::MessageBruteForce::Description &message = model.newMessage<flamegpu::MessageBruteForce>(messageName);
+	        	            flamegpu::MessageBruteForce::Description message = model.newMessage<flamegpu::MessageBruteForce>(messageName);
                             // A message to hold the location of an agent.
                             message.newVariable<int>("id");
                             message.newVariable<float>("x");
@@ -731,7 +736,7 @@ int main(int argc, const char ** argv) {
                     }
                     {   // Boid agent
                         std::string agentName("Boid");
-                        flamegpu::AgentDescription &agent = model.newAgent(agentName);
+                        flamegpu::AgentDescription agent = model.newAgent(agentName);
                         agent.newVariable<int>("id");
                         agent.newVariable<float>("x");
                         agent.newVariable<float>("y");
@@ -757,13 +762,13 @@ int main(int argc, const char ** argv) {
                     */     
                     model.addInitFunction(Init);
                     {   // Layer #1
-                        flamegpu::LayerDescription &layer = model.newLayer();
+                        flamegpu::LayerDescription layer = model.newLayer();
                         std::string agentName = "Boid";
                         std::string outputFuncName = "outputdata";
                         layer.addAgentFunction(agentName, agentName + outputFuncName);
                     }
                     {   // Layer #2
-                        flamegpu::LayerDescription &layer = model.newLayer();
+                        flamegpu::LayerDescription layer = model.newLayer();
                         std::string agentName = "Boid";
                         std::string inputFuncName = "inputdata";
                         layer.addAgentFunction(agentName, agentName + inputFuncName);
@@ -773,10 +778,9 @@ int main(int argc, const char ** argv) {
                     * Execution
                     */
                     std::cout << "Running ensemble size: " << ensembleSize << std::endl;
-                    unsigned int runsRemaining = experiment.totalRuns;
                     const auto startTime = std::chrono::system_clock::now();
-                    while (runsRemaining) {
-                        flamegpu::RunPlanVector runs(model, ensembleSize);
+                    {
+                        flamegpu::RunPlanVector runs(model, experiment.totalRuns);
                         {
                             runs.setSteps(experiment.steps);
                             
@@ -790,9 +794,11 @@ int main(int argc, const char ** argv) {
                         
                         flamegpu::CUDAEnsemble cuda_ensemble(model, argc, argv);              
                         cuda_ensemble.Config().out_format = "";
-                        cuda_ensemble.Config().quiet = true;
+                        cuda_ensemble.Config().verbosity = flamegpu::Verbosity::Quiet;
+                        cuda_ensemble.Config().telemetry = false;
+                        cuda_ensemble.Config().concurrent_runs = ensembleSize;
+                        cuda_ensemble.Config().devices = {0};
                         cuda_ensemble.simulate(runs);
-                        runsRemaining -= ensembleSize;
                     }
                     const auto endTime = std::chrono::system_clock::now();
                     const auto runTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
@@ -803,10 +809,6 @@ int main(int argc, const char ** argv) {
                         csv << repetition << "," << popSize << "," << ensembleSize << "," << runTime / 1000.0 << std::endl;
                     }
 
-#ifdef VISUALISATION
-                    visualisation.join();
-                    visualisation.close();
-#endif
                 }
             }
         }  
